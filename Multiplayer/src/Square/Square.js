@@ -46,6 +46,7 @@ const crossSvg = (
 
 export const Square = (
     {
+        finishedArrayState,
         setGameState,
         id,
         currentPlayer,
@@ -84,9 +85,9 @@ export const Square = (
         })
     }
     return (
-        <div onClick={clickOnSquare} className={`square ${finishedState ? 'not-allowed': ''}`}>
+        <div onClick={clickOnSquare} className={`square ${finishedState ? 'not-allowed': '' } ${ finishedArrayState.includes(id) ? finishedState + "-won":''} `}>
             {icon}
         </div>
-    )
+    ) 
 }
 

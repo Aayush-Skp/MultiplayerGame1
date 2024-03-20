@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
+import {io } from 'socket.io-client';
 import './App.css';
 import { Square } from './Square/Square';
+const socket = io('http://localhost:3000',{
+  autoConnect:true,
+});
 
 const renderFrom =[
   [1,2,3],
@@ -14,6 +18,8 @@ function App() {
     const[currentPlayer, setCurrentPlayer]= useState('circle');
     const [finishedState, setFinishedState] =useState(false);
     const [finishedArrayState, setFinishedArrayState]= useState([]);
+    const[playOnline, setPlayOnline]=useState(false); 
+    const [socket, setSocket] =useState(null);
 
 
 
@@ -21,12 +27,14 @@ function App() {
       // row dyanamic
       for (let row =0; row<gameState.length; row++){
         if(gameState[row][0] === gameState[row][1] && gameState[row][1] === gameState[row][2]){
+          setFinishedArrayState([row * 3 + 0, row * 3 + 1 , row * 3 +2])
           return gameState[row][0];
         }
       }
      //column dynamic
       for (let col =0; col<gameState.length; col++){
         if(gameState[0][col] === gameState[1][col] && gameState[1][col] === gameState[2][col]){
+          setFinishedArrayState([0 * 3 + col, 1 * 3 + col,2 * 3 + col]);
           return gameState[0][col];
         }
       }
@@ -61,6 +69,25 @@ function App() {
         setFinishedState(winner);
       }
     }, [gameState]);
+   
+   socket?.on('connect',function(){
+    setPlayOnline(true);
+   })
+
+
+function playOnlineCLick(){
+  const newSocket =io("http://localhost:3000",{
+    autoConnect:true,
+  });
+  setSocket(newSocket);
+}
+
+
+    if (!playOnline){
+      return <div className='main-div'>
+        <button onClick={playOnlineCLick} className='playOnline'>Play Online</button>
+      </div>
+    }
 
 
   return (
@@ -79,6 +106,7 @@ function App() {
         gameState.map((arr, rowIndex) =>
           arr.map((e, colIndex)=>{
             return <Square
+            finishedArrayState={finishedArrayState}
              finishedState={finishedState}
             currentPlayer={currentPlayer}
             setCurrentPlayer={setCurrentPlayer}
